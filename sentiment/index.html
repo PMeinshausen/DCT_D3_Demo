@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Teradata DCT D3 Demo</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="source/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles -->
+    <link href="source/dashboard.css" rel="stylesheet">
+
+    <style>
+
+    body {
+      font: 10px sans-serif;
+    }
+
+    .chart {
+      background: #fff;
+    }
+
+    p {
+      font: 12px helvetica;
+    }
+
+
+    .axis path, .axis line {
+      fill: none;
+      stroke: none;
+      /*stroke-width: 2px;*/
+      shape-rendering: crispEdges;
+    }
+
+    button {
+      position: absolute;
+      right: 50px;
+      top: 10px;
+    }
+    </style>
+
+
+    <script src="source/d3.js"></script>
+
+  </head>
+
+  <body>
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Teradata DCT D3 Demo</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#"></a></li>
+            <li><a href="#"></a></li>
+            <li><a href="#"></a></li>
+          </ul>
+          <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search...">
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <li><a href="#">Word Search <span class="sr-only">(current)</span></a></li>
+            <li class="active"><a href="#">Sentiment</a></li>
+            <li><a href="#">Analytics</a></li>
+            <li><a href="#"></a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li><a href=""></a></li>
+            <li><a href=""></a></li>
+            <li><a href=""></a></li>
+            <li><a href=""></a></li>
+            <li><a href=""></a></li>
+          </ul>
+          <ul class="nav nav-sidebar">
+            <li><a href=""></a></li>
+            <li><a href=""></a></li>
+            <li><a href=""></a></li>
+          </ul>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header">Dashboard</h1>
+          <div class="chart"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+
+      chart('sent2.tsv', 'orange');
+
+      var datearray = [];
+      var colorrange = [];
+
+      function chart(csvpath, color){
+
+        if (color == 'orange'){
+          colorrange = ["#B30000", "#E34A33", "#FC8D59",
+                        "#FDBB84", "#FDD49E", "#FEF0D9"];
+        }
+        colorrange = ["#B30000", "#E34A33", "#FC8D59",
+        "#FDBB84", "#FDD49E", "#FEF0D9"];
+        strokecolor = colorrange[0];
+
+        var format = d3.time.format('%Y-%m-%d');
+
+        var margin = {top: 20, right: 40, bottom: 30, left: 40};
+        var width = 1000 - margin.left - margin.right;
+        var height = 400 - margin.top - margin.bottom;
+
+        var tooltip = d3.select(".chart")
+            .append("div")
+            .attr("class", "remove")
+            .style("position", "absolute")
+            .style("z-index", "20")
+            .style("visibility", "hidden")
+            .style("top", "100px")
+            .style("left", "255px");
+
+        var x = d3.time.scale()
+            .range([2, width]);
+
+        var y = d3.scale.linear()
+            .range([height, 0]);
+
+        var z = d3.scale.ordinal()
+            .range(colorrange);
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient('bottom');
+
+        var yAxis = d3.svg.axis()
+            .scale(y);
+
+        var yAxisr = d3.svg.axis()
+            .scale(y);
+
+        var test_format = d3.time.format("%m/%d/%y");
+
+        var test_stack = d3.layout.stack()
+            .offset("silhouette")
+            .values(function(d) { return d.values; })
+            .x(function(d) { return d.date; })
+            .y(function(d) { return d.value; });
+
+        var test_nest = d3.nest()
+            .key(function(d) { return d.key; });
+
+        var test_area = d3.svg.area()
+            .interpolate("cardinal")
+            .x(function(d) { return x(d.date); })
+            .y0(function(d) { return y(d.y0); })
+            .y1(function(d) { return y(d.y0 + d.y); });
+
+        d3.csv('sent3.csv', function(data){
+          data.forEach(function(d){
+            d.date = test_format.parse(d.date);
+            d.value = +d.value;
+          });
+          console.log(data);
+          var test_layers = test_stack(test_nest.entries(data));
+          console.log(test_layers);
+        })
+
+
+        var stack = d3.layout.stack()
+            .offset('silhouette')
+            .values(function(d){ return d.values; })
+            .x(function(d){ return d.date; })
+            .y(function(d){ return d.value; });
+
+        var nest = d3.nest()
+            .key(function(d) { return d.key; });
+
+        var area = d3.svg.area()
+            .interpolate('cardinal')
+            .x(function(d) { return x(d.date); })
+            .y0(function(d) { return y(d.y0); })
+            .y1(function(d) { return y(d.y0 + d.y); });
+
+        var line = d3.svg.line()
+            .interpolate('cardinal')
+            .x(function(d){ return x(d.date); })
+            .y(function(d){ return y(d.y); });
+
+
+        var svg = d3.select('.chart').append('svg')
+            .attr('width', width + margin.left + margin.right)
+            .attr('height', height + margin.top + margin.bottom)
+          .append('g')
+            .attr('transform','translate(' + margin.left + ',' + margin.top + ')');
+
+        var graph = d3.tsv(csvpath, function(error, data){
+            data.forEach(function(d){
+                //d.tweetDate = format.parse(d.tweetDate);
+            });
+            data.sort(function(a,b){
+              return a.tweetDate - b.tweetDate;
+            });
+            var nestData = d3.nest()
+                .key(function(d){ return d.sentiment; })
+                .key(function(d){ return d.tweetDate; })
+                .rollup(function(leaves){ return leaves.length; })
+                .entries(data);
+
+            origData = [];
+            for(i=0; i<3; i++){
+              for(j=0; j<nestData[i].values.length; j++){
+                dict = {};
+                dict['key'] = nestData[i].key;
+                dict['date'] = format.parse(nestData[i].values[j].key);
+                dict['value'] = nestData[i].values[j].values;
+                origData.push(dict);
+              }
+            }
+            origData.sort(function(a,b){
+              return a.date - b.date;
+            });
+
+            console.log(origData);
+            var layers = stack(nest.entries(origData));
+            console.log(layers);
+
+            x.domain(d3.extent(origData, function(d){ return d.date; }));
+            y.domain([0, d3.max(origData, function(d){ return d.y0 + d.y; })]);
+
+            svg.selectAll('.layer')
+                .data(layers)
+              .enter().append('path')
+                .attr('class', 'layer')
+                .attr('d', function(d){ return area(d.values); })
+                .style('fill', function(d, i){ return z(i); });
+                //.style('fill', function(d, i){ return z(i); });
+
+            svg.append('g')
+                .attr('class', 'x axis')
+                .attr('transform', 'translate(0,' + height + ')')
+                .call(xAxis);
+
+            svg.append('g')
+                .attr('class', 'y axis')
+                .attr('transform', 'translate(' + width + ', 0)')
+                .call(yAxis.orient('right'));
+
+            svg.append('g')
+                .attr('class', 'y axis')
+                .call(yAxis.orient('left'));
+
+
+            svg.selectAll('.layer')
+                .attr('opacity', 1)
+                .on("mouseover", function(d, i) {
+                  svg.selectAll(".layer").transition()
+                  .duration(250)
+                  .attr("opacity", function(d, j) {
+                    return j != i ? 0.6 : 1;
+                  })})
+
+                  .on("mousemove", function(d, i) {
+                    mousex = d3.mouse(this);
+                    mousex = mousex[0];
+                    var invertedx = x.invert(mousex);
+                    invertedx = invertedx.getMonth() + invertedx.getDate();
+                    var selected = (d.values);
+                    for (var k = 0; k < selected.length; k++) {
+                      datearray[k] = selected[k].date
+                      datearray[k] = datearray[k].getMonth() + datearray[k].getDate();
+                    }
+
+                    mousedate = datearray.indexOf(invertedx);
+                    pro = d.values[mousedate].value;
+
+                    d3.select(this)
+                    .classed("hover", true)
+                    .attr("stroke", strokecolor)
+                    .attr("stroke-width", "0.5px"),
+                    tooltip.html( "<p>" + d.key + "<br>" + pro + "</p>" ).style("visibility", "visible");
+
+                  })
+                  .on("mouseout", function(d, i) {
+                    svg.selectAll(".layer")
+                    .transition()
+                    .duration(250)
+                    .attr("opacity", "1");
+                    d3.select(this)
+                    .classed("hover", false)
+                    .attr("stroke-width", "0px"), tooltip.html( "<p>" + d.key + "<br>" + pro + "</p>" ).style("visibility", "hidden");
+                  })
+
+              var vertical = d3.select(".chart")
+                  .append("div")
+                  .attr("class", "remove")
+                  .style("position", "absolute")
+                  .style("z-index", "19")
+                  .style("width", "1px")
+                  .style("height", "380px")
+                  .style("top", "10px")
+                  .style("bottom", "30px")
+                  .style("left", "0px")
+                  .style("background", "#fff");
+
+              d3.select(".chart")
+                  .on("mousemove", function(){
+                    mousex = d3.mouse(this);
+                    mousex = mousex[0] + 5;
+                    vertical.style("left", mousex + "px" )})
+                  .on("mouseover", function(){
+                    mousex = d3.mouse(this);
+                    mousex = mousex[0] + 5;
+                    vertical.style("left", mousex + "px")});
+        });
+
+
+      }
+
+
+
+
+
+    </script>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="source/jquery-2.1.3.min.js"></script>
+    <script src="source/bootstrap.min.js"></script>
+    <script src="source/docs.min.js"></script>
+
+  </body>
+</html>
