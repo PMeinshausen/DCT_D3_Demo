@@ -1,7 +1,7 @@
 # DCT_D3_Demo
 D3 Demo for DCT 2015
 
-This README will contain a few cursory instructions. There are many great D3 intro tutorials floating around the web. I also highly recommend the book [http://shop.oreilly.com/product/0636920026938.do]("Interactive Data Visualization for the Web") by Scott Murray. And of course, if you have any questions, please feel free to email me at paul.meinshausen@teradata.com
+This README will contain a few cursory instructions. There are many great D3 intro tutorials floating around the web. I also highly recommend the book (http://shop.oreilly.com/product/0636920026938.do)["Interactive Data Visualization for the Web"] by Scott Murray. And of course, if you have any questions, please feel free to email me at paul.meinshausen@teradata.com
 
 ## Set up a Python web server
 
