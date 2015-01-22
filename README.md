@@ -5,7 +5,7 @@ This README will contain a few cursory instructions. There are many great D3 int
 
 ## Set up a Python web server
 
-The best way to get started with D3 is to run visualizations from a Python miniserver in your directory. This is a fairly simple process (assuming you're running any version 2 of Python. Also, if you're using Windows, you'll need to make sure you have Python installed):
+The best way to get started with D3 is to run visualizations from a Python miniserver running in your project directory. This is a fairly simple process (assuming you're using Python version 2.x. Also, if you're using Windows, you'll need to make sure you have Python installed):
 
 1) Using the command line, navigate to the directory/folder where you will store your visualization scripts/files.
 
